@@ -31,8 +31,7 @@ export default function HomePage() {
     if (searchQuery) {
       filtered = filtered.filter(
         (recipe) =>
-          recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 

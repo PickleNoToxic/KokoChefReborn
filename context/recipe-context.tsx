@@ -6,11 +6,8 @@ import { createContext, useContext, useState, useEffect } from "react"
 export interface Recipe {
   id: string
   title: string
-  description: string
   category: string
   cookingTime: number
-  servings: number
-  difficulty: "Easy" | "Medium" | "Hard"
   image: string
   ingredients: string[]
   steps: string[]
@@ -36,11 +33,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "1",
     title: "Classic Margherita Pizza",
-    description: "Traditional Italian pizza with fresh mozzarella, basil, and tomato sauce",
     category: "Makanan Utama",
     cookingTime: 30,
-    servings: 4,
-    difficulty: "Medium",
     image: "/margherita-pizza.png",
     ingredients: ["Pizza dough", "Tomato sauce", "Fresh mozzarella", "Basil", "Olive oil", "Salt"],
     steps: [
@@ -57,11 +51,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "2",
     title: "Creamy Pasta Carbonara",
-    description: "Authentic Roman pasta with eggs, cheese, and pancetta",
     category: "Makanan Utama",
     cookingTime: 20,
-    servings: 2,
-    difficulty: "Easy",
     image: "/pasta-carbonara.png",
     ingredients: ["Spaghetti", "Eggs", "Pancetta", "Pecorino Romano", "Black pepper", "Salt"],
     steps: [
@@ -78,11 +69,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "3",
     title: "Thai Green Curry",
-    description: "Spicy and aromatic Thai curry with coconut milk and vegetables",
     category: "Makanan Utama",
     cookingTime: 25,
-    servings: 4,
-    difficulty: "Medium",
     image: "/thai-green-curry.png",
     ingredients: ["Coconut milk", "Green curry paste", "Chicken", "Bell peppers", "Basil", "Fish sauce"],
     steps: ["Heat coconut milk", "Add curry paste", "Cook chicken", "Add vegetables", "Simmer until cooked"],
@@ -93,11 +81,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "4",
     title: "Chocolate Lava Cake",
-    description: "Decadent chocolate cake with a molten center",
     category: "Dessert",
     cookingTime: 15,
-    servings: 2,
-    difficulty: "Medium",
     image: "/chocolate-lava-cake.png",
     ingredients: ["Dark chocolate", "Butter", "Eggs", "Sugar", "Flour", "Vanilla"],
     steps: [
@@ -114,11 +99,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "5",
     title: "Mediterranean Salad",
-    description: "Fresh and healthy salad with feta, olives, and vegetables",
     category: "Dessert",
     cookingTime: 10,
-    servings: 2,
-    difficulty: "Easy",
     image: "/mediterranean-salad.png",
     ingredients: ["Tomatoes", "Cucumber", "Feta cheese", "Olives", "Red onion", "Olive oil"],
     steps: ["Chop vegetables", "Combine in bowl", "Add feta and olives", "Drizzle with olive oil", "Season and serve"],
@@ -129,11 +111,8 @@ const SAMPLE_RECIPES: Recipe[] = [
   {
     id: "6",
     title: "Spicy Tacos",
-    description: "Mexican-style tacos with seasoned meat and fresh toppings",
     category: "Cemilan",
     cookingTime: 20,
-    servings: 4,
-    difficulty: "Easy",
     image: "/spicy-tacos.jpg",
     ingredients: ["Ground beef", "Taco shells", "Lettuce", "Tomato", "Cheese", "Salsa"],
     steps: ["Brown ground beef", "Add taco seasoning", "Warm taco shells", "Assemble tacos", "Add toppings and serve"],

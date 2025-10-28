@@ -17,7 +17,6 @@ interface RecipeFormProps {
 }
 
 const CATEGORIES = ["Makanan Utama", "Minuman", "Cemilan", "Dessert", "Lainnya"]
-const DIFFICULTIES = ["Easy", "Medium", "Hard"]
 
 export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps) {
   const { user } = useAuth()
@@ -26,11 +25,8 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
 
   const [formData, setFormData] = useState({
     title: initialRecipe?.title || "",
-    description: initialRecipe?.description || "",
-    category: initialRecipe?.category || "Lainnya",
+    category: initialRecipe?.category || "Makanan Utama",
     cookingTime: initialRecipe?.cookingTime || 30,
-    servings: initialRecipe?.servings || 4,
-    difficulty: initialRecipe?.difficulty || "Medium",
     image: initialRecipe?.image || "/placeholder.svg",
     ingredients: initialRecipe?.ingredients || [""],
     steps: initialRecipe?.steps || [""],
@@ -43,7 +39,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "cookingTime" || name === "servings" ? Number.parseInt(value) : value,
+      [name]: name === "cookingTime" ? Number.parseInt(value) : value,
     }))
   }
 
