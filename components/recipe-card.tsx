@@ -27,7 +27,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
             <h3 className="font-semibold text-lg line-clamp-2">{recipe.title}</h3>
-            <p className="text-xs text-muted-foreground mt-1">by {recipe.creatorName}</p>
+            <p className="text-xs text-muted-foreground mt-1">oleh {recipe.creatorName}</p>
           </div>
         </div>
       </CardHeader>

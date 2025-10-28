@@ -94,17 +94,17 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
     setError("")
 
     if (!formData.title.trim()) {
-      setError("Recipe title is required")
+      setError("Nama resep harus diisi")
       return
     }
 
     if (formData.ingredients.some((ing) => !ing.trim())) {
-      setError("All ingredients must be filled in")
+      setError("Semua bahan harus diisi")
       return
     }
 
     if (formData.steps.some((step) => !step.trim())) {
-      setError("All steps must be filled in")
+      setError("Semua langkah harus diisi")
       return
     }
 
@@ -141,12 +141,12 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
       {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Recipe Information</CardTitle>
+          <CardTitle>Informasi Resep</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label htmlFor="title" className="text-sm font-medium">
-              Recipe Title *
+              Nama Resep *
             </label>
             <Input
               id="title"
@@ -161,7 +161,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="category" className="text-sm font-medium">
-                Category *
+                Kategori *
               </label>
               <select
                 id="category"
@@ -180,7 +180,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
 
             <div>
               <label htmlFor="cookingTime" className="text-sm font-medium">
-                Cooking Time (minutes) *
+                Durasi Memasak (menit) *
               </label>
               <Input
                 id="cookingTime"
@@ -212,7 +212,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
       {/* Ingredients */}
       <Card>
         <CardHeader>
-          <CardTitle>Ingredients</CardTitle>
+          <CardTitle>Bahan-bahan</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {formData.ingredients.map((ingredient, index) => (
@@ -220,17 +220,17 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
               <Input
                 value={ingredient}
                 onChange={(e) => handleIngredientChange(index, e.target.value)}
-                placeholder={`Ingredient ${index + 1}`}
+                placeholder={`Bahan ${index + 1}`}
               />
               {formData.ingredients.length > 1 && (
                 <Button type="button" variant="outline" onClick={() => removeIngredient(index)} className="px-3">
-                  Remove
+                  Hapus
                 </Button>
               )}
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addIngredient} className="w-full bg-transparent">
-            + Add Ingredient
+            + Tambah Bahan
           </Button>
         </CardContent>
       </Card>
@@ -238,7 +238,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
       {/* Steps */}
       <Card>
         <CardHeader>
-          <CardTitle>Cooking Steps</CardTitle>
+          <CardTitle>Langkah-langkah</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {formData.steps.map((step, index) => (
@@ -249,19 +249,19 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
               <textarea
                 value={step}
                 onChange={(e) => handleStepChange(index, e.target.value)}
-                placeholder={`Step ${index + 1}`}
+                placeholder={`Langkah ${index + 1}`}
                 className="flex-1 px-3 py-2 border border-input rounded-md bg-background text-foreground"
                 rows={2}
               />
               {formData.steps.length > 1 && (
                 <Button type="button" variant="outline" onClick={() => removeStep(index)} className="px-3">
-                  Remove
+                  Hapus
                 </Button>
               )}
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addStep} className="w-full bg-transparent">
-            + Add Step
+            + Tambah Langkah
           </Button>
         </CardContent>
       </Card>
@@ -269,10 +269,10 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
       {/* Submit */}
       <div className="flex gap-4">
         <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90" disabled={isLoading}>
-          {isLoading ? "Saving..." : isEditing ? "Update Recipe" : "Create Recipe"}
+          {isLoading ? "Loading..." : isEditing ? "Perbarui Resep" : "Tambahkan Resep"}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
-          Cancel
+          Batal
         </Button>
       </div>
     </form>

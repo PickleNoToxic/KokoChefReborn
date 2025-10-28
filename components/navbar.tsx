@@ -38,7 +38,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold text-primary">RecipeHub</div>
+            <div className="text-2xl font-bold text-primary">KokoChef</div>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -62,7 +62,7 @@ export function Navbar() {
                       className="w-full text-left px-4 py-2 hover:bg-secondary/50 transition-colors text-sm"
                       onClick={() => setShowMenu(false)}
                     >
-                      My Recipes
+                      Resep Saya
                     </button>
                   </Link>
                   <Link href="/bookmarks">

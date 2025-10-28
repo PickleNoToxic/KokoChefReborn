@@ -44,15 +44,15 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>Join RecipeHub and start sharing recipes</CardDescription>
+        <CardTitle>Buat Akunmu</CardTitle>
+        <CardDescription>Bergabunglah dengan KokoChef dan mulai bagikan resepmu</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
-              Full Name
+              Nama Lengkap
             </label>
             <Input
               id="name"

@@ -36,8 +36,8 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Welcome Back</CardTitle>
-        <CardDescription>Sign in to your RecipeHub account</CardDescription>
+        <CardTitle>Selamat Datang Kembali</CardTitle>
+        <CardDescription>Masuk ke akun KokoChef kamu</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

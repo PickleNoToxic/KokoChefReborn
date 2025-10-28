@@ -32,7 +32,7 @@ export function RecipeSearch({ onSearch, onCategoryChange, categories }: RecipeS
       <div>
         <Input
           type="text"
-          placeholder="Search recipes..."
+          placeholder="Cari resep..."
           value={searchQuery}
           onChange={handleSearch}
           className="w-full"

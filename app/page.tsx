@@ -59,8 +59,8 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Discover Recipes</h1>
-            <p className="text-muted-foreground">Explore delicious recipes from our community</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Temukan Resep</h1>
+            <p className="text-muted-foreground">Jelajahi berbagai resep lezat dari berbagai pengguna kami</p>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export default function HomePage() {
 
         {filteredRecipes.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No recipes found. Try adjusting your search.</p>
+            <p className="text-muted-foreground text-lg">Tidak ada resep yang cocok dengan pencarian Anda</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

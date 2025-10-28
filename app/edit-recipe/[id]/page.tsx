@@ -43,8 +43,8 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
       <Navbar />
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Edit Recipe</h1>
-          <p className="text-muted-foreground">Update your recipe details</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Edit Resep</h1>
+          <p className="text-muted-foreground">Perbarui informasi resepmu</p>
         </div>
         <RecipeForm initialRecipe={recipe} isEditing={true} />
       </main>

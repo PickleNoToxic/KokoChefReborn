@@ -44,7 +44,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/">
           <Button variant="ghost" className="mb-6">
-            ← Back to Recipes
+            ← Kembali
           </Button>
         </Link>
 
@@ -75,15 +75,15 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Cooking Time</p>
-                    <p className="text-2xl font-bold text-primary">{recipe.cookingTime} min</p>
+                    <p className="text-sm text-muted-foreground">Durasi Memasak</p>
+                    <p className="text-2xl font-bold text-primary">{recipe.cookingTime} menit</p>
                   </div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Category</p>
+                    <p className="text-sm text-muted-foreground">Kategori</p>
                     <p className="text-2xl font-bold text-primary">{recipe.category}</p>
                   </div>
                 </CardContent>
@@ -97,7 +97,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
           {/* Ingredients */}
           <Card>
             <CardHeader>
-              <CardTitle>Ingredients</CardTitle>
+              <CardTitle>Bahan-bahan</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
@@ -115,7 +115,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
           {/* Steps */}
           <Card>
             <CardHeader>
-              <CardTitle>Cooking Steps</CardTitle>
+              <CardTitle>Langkah-langkah</CardTitle>
             </CardHeader>
             <CardContent>
               <ol className="space-y-4">
