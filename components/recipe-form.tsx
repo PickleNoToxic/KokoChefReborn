@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Recipe } from "@/context/recipe-context";
+import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/context/toast-context";
 
 interface RecipeFormProps {
   initialRecipe?: Recipe;
@@ -24,24 +26,33 @@ const CATEGORIES = [
   "Lainnya",
 ];
 
+type FormState = {
+  title: string;
+  category: string;
+  cookingTime: number | "";
+  image: string;
+  ingredients: string[];
+  steps: string[];
+};
+
 export function RecipeForm({
   initialRecipe,
   isEditing = false,
 }: RecipeFormProps) {
   const { user } = useAuth();
-  const { addRecipe, updateRecipe } = useRecipes();
+  const { addRecipe, updateRecipe, fetchRecipes } = useRecipes();
   const router = useRouter();
+  const { addToast } = useToast();
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormState>({
     title: initialRecipe?.title || "",
     category: initialRecipe?.category || "Makanan Utama",
-    cookingTime: initialRecipe?.cookingTime || 30,
+    cookingTime: initialRecipe?.cookingTime ?? 30,
     image: initialRecipe?.image || "/placeholder.svg",
     ingredients: initialRecipe?.ingredients || [""],
     steps: initialRecipe?.steps || [""],
   });
 
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (
@@ -52,7 +63,14 @@ export function RecipeForm({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "cookingTime" ? Number.parseInt(value) : value,
+      [name]:
+        name === "cookingTime"
+          ? value === ""
+            ? ""
+            : Number.isNaN(Number.parseInt(value))
+            ? prev.cookingTime
+            : Number.parseInt(value)
+          : value,
     }));
   };
 
@@ -104,20 +122,26 @@ export function RecipeForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    // clear previous error state if any (toast handles messaging)
 
     if (!formData.title.trim()) {
-      setError("Nama resep harus diisi");
+      addToast("Nama resep harus diisi", true);
       return;
     }
 
     if (formData.ingredients.some((ing) => !ing.trim())) {
-      setError("Semua bahan harus diisi");
+      addToast("Semua bahan harus diisi", true);
       return;
     }
 
     if (formData.steps.some((step) => !step.trim())) {
-      setError("Semua langkah harus diisi");
+      addToast("Semua langkah harus diisi", true);
+      return;
+    }
+
+    // Validate cooking time to avoid NaN
+    if (formData.cookingTime === "" || Number(formData.cookingTime) <= 0) {
+      addToast("Durasi memasak harus diisi dengan benar", true);
       return;
     }
 
@@ -125,23 +149,65 @@ export function RecipeForm({
 
     try {
       if (isEditing && initialRecipe) {
+        // Editing flow (belum dihubungkan ke Supabase)
         updateRecipe(initialRecipe.id, {
           ...formData,
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
         });
+        addToast("Resep diperbarui");
+        router.push(`/recipe/${initialRecipe?.id}`);
       } else {
-        addRecipe({
-          ...formData,
+        // Add flow: upload gambar (jika ada) ke Supabase Storage, lalu insert ke tabel recipes
+        let publicUrl: string | null = null;
+
+        if (imageFile) {
+          const fileName = `${user!.id}_${Date.now()}.jpg`;
+          const filePath = fileName; // Simpan langsung di root bucket
+
+          const { error: uploadError } = await supabase.storage
+            .from("recipes-images")
+            .upload(filePath, imageFile, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: imageFile.type,
+            });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicData } = supabase.storage
+            .from("recipes-images")
+            .getPublicUrl(filePath);
+
+          publicUrl =
+            publicData.publicUrl ||
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/recipes-images/${filePath}`;
+        }
+
+        const payload = {
+          user_id: user!.id,
+          title: formData.title.trim(),
+          image_url: publicUrl,
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
-          creatorId: user!.id,
-          creatorName: user!.username,
-        });
+          likes: 0,
+          category: formData.category,
+          duration: Number(formData.cookingTime),
+        } as const;
+
+        const { error: insertError } = await supabase
+          .from("recipes")
+          .insert(payload);
+
+        if (insertError) throw insertError;
+
+        await fetchRecipes();
+        addToast("Resep berhasil ditambahkan!");
+        router.push("/my-recipes");
       }
-      router.push(isEditing ? `/recipe/${initialRecipe?.id}` : "/my-recipes");
-    } catch (err) {
-      setError("Failed to save recipe. Please try again.");
+    } catch (err: any) {
+      console.error(err);
+      addToast("Gagal menyimpan resep", true);
     } finally {
       setIsLoading(false);
     }
@@ -149,11 +215,6 @@ export function RecipeForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-          {error}
-        </div>
-      )}
 
       {/* Basic Info */}
       <Card>
