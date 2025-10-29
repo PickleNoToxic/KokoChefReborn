@@ -123,7 +123,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
           creatorId: user!.id,
-          creatorName: user!.name,
+          creatorName: user!.username,
         })
       }
       router.push(isEditing ? `/recipe/${initialRecipe?.id}` : "/my-recipes")

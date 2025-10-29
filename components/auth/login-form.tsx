@@ -26,8 +26,19 @@ export function LoginForm() {
     try {
       await login(email, password)
       router.push("/")
-    } catch (err) {
-      setError("Failed to login. Please try again.")
+    } catch (err: any) {
+
+    let message = "Terjadi kesalahan. Silakan coba lagi.";
+
+    if (err?.message) {
+      switch (err.message) {
+        case "Invalid login credentials":
+          message = "Email atau password salah.";
+          break;
+      }
+    }
+
+    setError(message);
     } finally {
       setIsLoading(false)
     }

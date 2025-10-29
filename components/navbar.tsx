@@ -50,9 +50,9 @@ export function Navbar() {
                 aria-label="Profile menu"
               >
                 <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user?.username?.charAt(0)?.toUpperCase() ?? "-"}
                 </div>
-                <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
+                <span className="text-sm font-medium hidden sm:inline">{user?.username ?? "User"}</span>
               </button>
 
               {showMenu && (

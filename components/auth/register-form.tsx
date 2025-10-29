@@ -1,55 +1,84 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 
 export function RegisterForm() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const { register } = useAuth()
-  const router = useRouter()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Password tidak sama. Silakan coba lagi.");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      await register(email, password, name)
-      router.push("/")
-    } catch (err) {
-      setError("Failed to register. Please try again.")
+      await register(email, password, name);
+      router.push("/");
+    } catch (err: any) {
+      let message = "Terjadi kesalahan. Silakan coba lagi.";
+      if (err?.message) {
+        switch (err.message) {
+          case "User already registered":
+            message = "Email ini sudah terdaftar.";
+            break;
+          case "Password should be at least 6 characters.":
+            message = "Password minimal 6 karakter.";
+            break;
+          case "Invalid email":
+            message = "Format email tidak valid.";
+            break;
+          default:
+            message = err.message;
+        }
+      }
+
+      setError(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Buat Akunmu</CardTitle>
-        <CardDescription>Bergabunglah dengan KokoChef dan mulai bagikan resepmu</CardDescription>
+        <CardDescription>
+          Bergabunglah dengan KokoChef dan mulai bagikan resepmu
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>}
+          {error && (
+            <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
               Nama Lengkap
@@ -114,5 +143,5 @@ export function RegisterForm() {
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
