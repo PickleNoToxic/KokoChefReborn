@@ -152,6 +152,7 @@ export function RecipeForm({
         // Editing flow (belum dihubungkan ke Supabase)
         updateRecipe(initialRecipe.id, {
           ...formData,
+          cookingTime: Number(formData.cookingTime) || 0,
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
         });

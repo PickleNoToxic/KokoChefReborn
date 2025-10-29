@@ -104,7 +104,7 @@ export default function MyRecipesPage() {
             {userRecipes.map((recipe) => (
               <Card
                 key={recipe.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                className="overflow-hidden hover:shadow-lg pt-0 transition-shadow flex flex-col"
               >
                 <div className="relative h-48 w-full overflow-hidden bg-muted">
                   <Image
