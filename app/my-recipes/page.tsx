@@ -9,6 +9,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { Trash2 } from "lucide-react"
 
 export default function MyRecipesPage() {
   const { user, isLoading } = useAuth()
@@ -101,7 +102,7 @@ export default function MyRecipesPage() {
                       size="icon"
                       onClick={() => setDeleteConfirm(deleteConfirm === recipe.id ? null : recipe.id)}
                     >
-                      🗑️
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                     {deleteConfirm === recipe.id && (
                       <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg p-3 z-50">
