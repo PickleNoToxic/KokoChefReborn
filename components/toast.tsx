@@ -32,7 +32,7 @@ export const Toast = ({ id, message, error = false, duration = 3000, onClose }: 
   return (
     <div
       className={clsx(
-        "flex items-center gap-3 p-4 rounded-lg shadow-lg border w-80 max-w-full transition-transform transform",
+        "flex items-center gap-3 p-4 rounded-lg shadow-lg border w-72 sm:w-80 max-w-full transition-transform transform",
         show ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
         "bg-white border border-gray-200 text-gray-900" 
       )}

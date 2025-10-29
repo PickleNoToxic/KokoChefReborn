@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { AlarmClock, Tags } from "lucide-react";
 
 export default function BookmarksPage() {
   const { user, isLoading } = useAuth();
@@ -98,8 +99,12 @@ export default function BookmarksPage() {
                     {recipe.description}
                   </p>
                   <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                    <span>⏱️ {recipe.cookingTime} menit</span>
-                    <span>🍴 {recipe.category}</span>
+                    <span className="flex items-center gap-2">
+                      <AlarmClock size={20} /> {recipe.cookingTime} menit
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Tags size={20} /> {recipe.category}{" "}
+                    </span>
                   </div>
                 </CardContent>
                 <CardFooter className="gap-2">

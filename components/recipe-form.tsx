@@ -1,28 +1,37 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
-import { useRecipes } from "@/context/recipe-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Recipe } from "@/context/recipe-context"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { useRecipes } from "@/context/recipe-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Recipe } from "@/context/recipe-context";
 
 interface RecipeFormProps {
-  initialRecipe?: Recipe
-  isEditing?: boolean
+  initialRecipe?: Recipe;
+  isEditing?: boolean;
 }
 
-const CATEGORIES = ["Makanan Utama", "Minuman", "Cemilan", "Dessert", "Lainnya"]
+const CATEGORIES = [
+  "Makanan Utama",
+  "Minuman",
+  "Cemilan",
+  "Dessert",
+  "Lainnya",
+];
 
-export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps) {
-  const { user } = useAuth()
-  const { addRecipe, updateRecipe } = useRecipes()
-  const router = useRouter()
-
+export function RecipeForm({
+  initialRecipe,
+  isEditing = false,
+}: RecipeFormProps) {
+  const { user } = useAuth();
+  const { addRecipe, updateRecipe } = useRecipes();
+  const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: initialRecipe?.title || "",
     category: initialRecipe?.category || "Makanan Utama",
@@ -30,85 +39,89 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
     image: initialRecipe?.image || "/placeholder.svg",
     ingredients: initialRecipe?.ingredients || [""],
     steps: initialRecipe?.steps || [""],
-  })
+  });
 
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: name === "cookingTime" ? Number.parseInt(value) : value,
-    }))
-  }
+    }));
+  };
 
   const handleIngredientChange = (index: number, value: string) => {
-    const newIngredients = [...formData.ingredients]
-    newIngredients[index] = value
+    const newIngredients = [...formData.ingredients];
+    newIngredients[index] = value;
     setFormData((prev) => ({
       ...prev,
       ingredients: newIngredients,
-    }))
-  }
+    }));
+  };
 
   const handleStepChange = (index: number, value: string) => {
-    const newSteps = [...formData.steps]
-    newSteps[index] = value
+    const newSteps = [...formData.steps];
+    newSteps[index] = value;
     setFormData((prev) => ({
       ...prev,
       steps: newSteps,
-    }))
-  }
+    }));
+  };
 
   const addIngredient = () => {
     setFormData((prev) => ({
       ...prev,
       ingredients: [...prev.ingredients, ""],
-    }))
-  }
+    }));
+  };
 
   const removeIngredient = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       ingredients: prev.ingredients.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const addStep = () => {
     setFormData((prev) => ({
       ...prev,
       steps: [...prev.steps, ""],
-    }))
-  }
+    }));
+  };
 
   const removeStep = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       steps: prev.steps.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     if (!formData.title.trim()) {
-      setError("Nama resep harus diisi")
-      return
+      setError("Nama resep harus diisi");
+      return;
     }
 
     if (formData.ingredients.some((ing) => !ing.trim())) {
-      setError("Semua bahan harus diisi")
-      return
+      setError("Semua bahan harus diisi");
+      return;
     }
 
     if (formData.steps.some((step) => !step.trim())) {
-      setError("Semua langkah harus diisi")
-      return
+      setError("Semua langkah harus diisi");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       if (isEditing && initialRecipe) {
@@ -116,7 +129,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
           ...formData,
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
-        })
+        });
       } else {
         addRecipe({
           ...formData,
@@ -124,19 +137,23 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
           steps: formData.steps.filter((step) => step.trim()),
           creatorId: user!.id,
           creatorName: user!.username,
-        })
+        });
       }
-      router.push(isEditing ? `/recipe/${initialRecipe?.id}` : "/my-recipes")
+      router.push(isEditing ? `/recipe/${initialRecipe?.id}` : "/my-recipes");
     } catch (err) {
-      setError("Failed to save recipe. Please try again.")
+      setError("Failed to save recipe. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>}
+      {error && (
+        <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Basic Info */}
       <Card>
@@ -146,7 +163,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
         <CardContent className="space-y-4">
           <div>
             <label htmlFor="title" className="text-sm font-medium">
-              Nama Resep *
+              Nama *
             </label>
             <Input
               id="title"
@@ -158,7 +175,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="category" className="text-sm font-medium">
                 Kategori *
@@ -168,7 +185,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
+                className="w-full px-3 py-2 min-w-44 border border-input rounded-md bg-background text-foreground"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -180,7 +197,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
 
             <div>
               <label htmlFor="cookingTime" className="text-sm font-medium">
-                Durasi Memasak (menit) *
+                Durasi (menit) *
               </label>
               <Input
                 id="cookingTime"
@@ -196,15 +213,38 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
 
           <div>
             <label htmlFor="image" className="text-sm font-medium">
-              Image URL
+              Upload Photo
             </label>
-            <Input
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleInputChange}
-              placeholder="https://example.com/image.jpg"
-            />
+            <div className="flex items-stretch h-9">
+              {" "}
+              {/* give a fixed height */}
+              <label
+                htmlFor="image"
+                className="cursor-pointer px-4 bg-[#f8f8f8] text-black border border-e-0 border-input text-sm rounded-l-md hover:bg-[#f8f8f8]/90 flex items-center"
+              >
+                Choose File
+              </label>
+              <p className="text-xs text-muted-foreground truncate border border-input flex-1 rounded-r-md px-2 flex items-center">
+                {imageFile ? imageFile.name : "No file chosen"}
+              </p>
+              <input
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setImageFile(file);
+                    setFormData((prev) => ({
+                      ...prev,
+                      image: URL.createObjectURL(file),
+                    }));
+                  }
+                }}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -217,19 +257,32 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
         <CardContent className="space-y-3">
           {formData.ingredients.map((ingredient, index) => (
             <div key={index} className="flex gap-2">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                {index + 1}
+              </div>
               <Input
                 value={ingredient}
                 onChange={(e) => handleIngredientChange(index, e.target.value)}
                 placeholder={`Bahan ${index + 1}`}
               />
               {formData.ingredients.length > 1 && (
-                <Button type="button" variant="outline" onClick={() => removeIngredient(index)} className="px-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => removeIngredient(index)}
+                  className="px-3"
+                >
                   Hapus
                 </Button>
               )}
             </div>
           ))}
-          <Button type="button" variant="outline" onClick={addIngredient} className="w-full bg-transparent">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addIngredient}
+            className="w-full bg-transparent"
+          >
             + Tambah Bahan
           </Button>
         </CardContent>
@@ -242,7 +295,7 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
         </CardHeader>
         <CardContent className="space-y-3">
           {formData.steps.map((step, index) => (
-            <div key={index} className="flex gap-2">
+            <div key={index} className="flex gap-2 items-center">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
                 {index + 1}
               </div>
@@ -254,13 +307,23 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
                 rows={2}
               />
               {formData.steps.length > 1 && (
-                <Button type="button" variant="outline" onClick={() => removeStep(index)} className="px-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => removeStep(index)}
+                  className="px-3"
+                >
                   Hapus
                 </Button>
               )}
             </div>
           ))}
-          <Button type="button" variant="outline" onClick={addStep} className="w-full bg-transparent">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addStep}
+            className="w-full bg-transparent"
+          >
             + Tambah Langkah
           </Button>
         </CardContent>
@@ -268,13 +331,26 @@ export function RecipeForm({ initialRecipe, isEditing = false }: RecipeFormProps
 
       {/* Submit */}
       <div className="flex gap-4">
-        <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90" disabled={isLoading}>
-          {isLoading ? "Loading..." : isEditing ? "Perbarui Resep" : "Tambahkan Resep"}
+        <Button
+          type="submit"
+          className="flex-1 bg-primary hover:bg-primary/90"
+          disabled={isLoading}
+        >
+          {isLoading
+            ? "Loading..."
+            : isEditing
+            ? "Perbarui Resep"
+            : "Tambahkan Resep"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          className="flex-1"
+        >
           Batal
         </Button>
       </div>
     </form>
-  )
+  );
 }

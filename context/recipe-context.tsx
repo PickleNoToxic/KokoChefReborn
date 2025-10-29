@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient";
-
+import { useToast } from "@/context/toast-context"
 export interface Recipe {
   id: string
   title: string
@@ -34,7 +34,7 @@ const RecipeContext = createContext<RecipeContextType | undefined>(undefined)
 export function RecipeProvider({ children }: { children: React.ReactNode }) {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [bookmarks, setBookmarks] = useState<string[]>([])
-
+  const { addToast } = useToast()
   // Fetch recipes from Supabase
   const fetchRecipes = async () => {
     const { data, error } = await supabase
@@ -92,13 +92,28 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     setRecipes(recipes.map((r) => (r.id === id ? { ...r, ...updates } : r)))
   }
 
+
   const toggleBookmark = (recipeId: string) => {
-    const newBookmarks = bookmarks.includes(recipeId)
+  try {
+    const isBookmarked = bookmarks.includes(recipeId)
+    const newBookmarks = isBookmarked
       ? bookmarks.filter((id) => id !== recipeId)
       : [...bookmarks, recipeId]
+
     setBookmarks(newBookmarks)
     localStorage.setItem("bookmarks", JSON.stringify(newBookmarks))
+
+    addToast(
+      isBookmarked
+        ? "Resep dihapus dari bookmark!"
+        : "Resep berhasil ditambahkan ke bookmark!",
+      false
+    )
+  } catch (error) {
+    console.error("Gagal memperbarui bookmark:", error)
+    addToast("Terjadi kesalahan saat memperbarui bookmark.", true)
   }
+}
 
   const getRecipesByCreator = (creatorId: string) => {
     return recipes.filter((r) => r.creatorId === creatorId)
