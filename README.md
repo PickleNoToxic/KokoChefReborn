@@ -7,3 +7,5 @@ npm i @supabase/supabase-js
 
 # run
 npm run dev
+
+run web site
