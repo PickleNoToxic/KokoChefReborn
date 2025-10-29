@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
+import { useToast } from "@/context/toast-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,19 +14,19 @@ import Link from "next/link"
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
+  const { addToast } = useToast()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
     setIsLoading(true)
 
     try {
       await login(email, password)
       router.push("/")
+      addToast("Selamat datang di KokoChef!", false)
     } catch (err: any) {
 
     let message = "Terjadi kesalahan. Silakan coba lagi.";
@@ -38,7 +39,8 @@ export function LoginForm() {
       }
     }
 
-    setError(message);
+    addToast(message, true);
+
     } finally {
       setIsLoading(false)
     }
@@ -52,7 +54,6 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">{error}</div>}
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
               Email

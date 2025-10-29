@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/context/toast-context"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,17 +22,16 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { addToast } = useToast();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (password !== confirmPassword) {
-      setError("Password tidak sama. Silakan coba lagi.");
+      addToast("Password tidak sama. Silakan coba lagi.", true);
       return;
     }
 
@@ -40,6 +40,7 @@ export function RegisterForm() {
     try {
       await register(email, password, name);
       router.push("/");
+      addToast("Selamat datang di KokoChef!", false);
     } catch (err: any) {
       let message = "Terjadi kesalahan. Silakan coba lagi.";
       if (err?.message) {
@@ -58,7 +59,7 @@ export function RegisterForm() {
         }
       }
 
-      setError(message);
+      addToast(message, true);
     } finally {
       setIsLoading(false);
     }
@@ -74,11 +75,6 @@ export function RegisterForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-              {error}
-            </div>
-          )}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
               Nama Lengkap
