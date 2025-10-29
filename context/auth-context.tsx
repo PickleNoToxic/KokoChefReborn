@@ -33,50 +33,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from("profiles")
       .select("username")
       .eq("id", userId)
-      .single(); 
+      .single();
     if (error) return null;
     return data?.username ?? null;
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      const sessionUser = data.session?.user;
+    let mounted = true;
 
-      if (sessionUser) {
-        const username = await getUserProfile(sessionUser.id);
-        setUser({
-          id: sessionUser.id,
-          email: sessionUser.email ?? "",
-          username,
-        });
-      }
-      setIsLoading(false);
-    };
+    const initAuth = async () => {
+      // 1️⃣ Tunggu Supabase siap membaca localStorage
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    fetchUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         const username = await getUserProfile(session.user.id);
-        setUser({
-          id: session.user.id,
-          email: session.user.email ?? "",
-          username,
+        if (mounted) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email ?? "",
+            username,
+          });
+        }
+      }
+
+      // 2️⃣ Jangan matikan loading sampai 1 tick berikutnya
+      // supaya Supabase sempat trigger onAuthStateChange jika perlu
+      setTimeout(() => {
+        if (mounted) setIsLoading(false);
+      }, 300);
+    };
+
+    initAuth();
+
+    // 3️⃣ Listener untuk perubahan session
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        getUserProfile(session.user.id).then((username) => {
+          if (mounted) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email ?? "",
+              username,
+            });
+          }
         });
       } else {
-        setUser(null);
+        if (mounted) setUser(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("🔄 Checking session...");
+    supabase.auth.getSession().then(({ data }) => {
+      console.log("Session fetched:", data.session);
+    });
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      setIsLoading(true); 
+      setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -92,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -102,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     username: string
   ) => {
     try {
-      setIsLoading(true); 
+      setIsLoading(true);
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
 
@@ -119,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
