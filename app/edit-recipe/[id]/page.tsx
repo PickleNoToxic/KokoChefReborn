@@ -5,9 +5,10 @@ import { useRecipes } from "@/context/recipe-context"
 import { Navbar } from "@/components/navbar"
 import { RecipeForm } from "@/components/recipe-form"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 
-export default function EditRecipePage({ params }: { params: { id: string } }) {
+export default function EditRecipePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const { user, isLoading } = useAuth()
   const { recipes } = useRecipes()
   const router = useRouter()
@@ -20,7 +21,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
   }, [user, isLoading, router])
 
   useEffect(() => {
-    const foundRecipe = recipes.find((r) => r.id === params.id)
+    const foundRecipe = recipes.find((r) => r.id === id)
     if (foundRecipe) {
       if (foundRecipe.creatorId !== user?.id) {
         router.push("/")
@@ -28,7 +29,7 @@ export default function EditRecipePage({ params }: { params: { id: string } }) {
         setRecipe(foundRecipe)
       }
     }
-  }, [recipes, params.id, user, router])
+  }, [recipes, id, user, router])
 
   if (isLoading || !recipe) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>

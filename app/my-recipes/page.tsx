@@ -98,13 +98,13 @@ export default function MyRecipesPage() {
                   </Link>
                   <div className="relative">
                     <Button
-                      variant="destructive"
+                      variant="destructive" 
                       size="icon"
                       onClick={() => setDeleteConfirm(deleteConfirm === recipe.id ? null : recipe.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                    {deleteConfirm === recipe.id && (
+                    {deleteConfirm == recipe.id && (
                       <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg p-3 z-50">
                         <p className="text-sm font-medium mb-3">Apakah kamu yakin ingin menghapus resep ini?</p>
                         <div className="flex gap-2">

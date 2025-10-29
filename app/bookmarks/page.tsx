@@ -91,9 +91,6 @@ export default function BookmarksPage() {
                         oleh {recipe.creatorName}
                       </p>
                     </div>
-                    <span className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full whitespace-nowrap">
-                      {recipe.category}
-                    </span>
                   </div>
                 </CardHeader>
                 <CardContent className="pb-3 flex-1">
@@ -111,14 +108,6 @@ export default function BookmarksPage() {
                       Lihat Resep
                     </Button>
                   </Link>
-                  <Button
-                    variant="default"
-                    size="icon"
-                    onClick={() => toggleBookmark(recipe.id)}
-                    title="Remove bookmark"
-                  >
-                    ❤️
-                  </Button>
                 </CardFooter>
               </Card>
             ))}
