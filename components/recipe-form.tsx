@@ -40,7 +40,7 @@ export function RecipeForm({
   isEditing = false,
 }: RecipeFormProps) {
   const { user } = useAuth();
-  const { addRecipe, updateRecipe, fetchRecipes } = useRecipes();
+  const { fetchRecipes } = useRecipes();
   const router = useRouter();
   const { addToast } = useToast();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -149,13 +149,53 @@ export function RecipeForm({
 
     try {
       if (isEditing && initialRecipe) {
-        // Editing flow (belum dihubungkan ke Supabase)
-        updateRecipe(initialRecipe.id, {
-          ...formData,
-          cookingTime: Number(formData.cookingTime) || 0,
+        // Editing flow: persist changes to Supabase
+        // 1) Handle optional new image upload
+        let publicUrl: string | null = initialRecipe.image || null;
+
+        if (imageFile) {
+          const fileName = `${user!.id}_${Date.now()}.jpg`;
+          const filePath = fileName;
+
+          const { error: uploadError } = await supabase.storage
+            .from("recipes-images")
+            .upload(filePath, imageFile, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: imageFile.type,
+            });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicData } = supabase.storage
+            .from("recipes-images")
+            .getPublicUrl(filePath);
+
+          publicUrl =
+            publicData.publicUrl ||
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/recipes-images/${filePath}`;
+        }
+
+        // 2) Update row in Supabase
+        const updatePayload = {
+          title: formData.title.trim(),
+          image_url: publicUrl,
           ingredients: formData.ingredients.filter((ing) => ing.trim()),
           steps: formData.steps.filter((step) => step.trim()),
-        });
+          category: formData.category,
+          duration: Number(formData.cookingTime) || 0,
+        } as const;
+
+        const { error: updateError } = await supabase
+          .from("recipes")
+          .update(updatePayload)
+          .eq("id", initialRecipe.id)
+          .eq("user_id", user!.id);
+
+        if (updateError) throw updateError;
+
+        // 3) Refresh context and navigate
+        await fetchRecipes();
         addToast("Resep diperbarui");
         router.push(`/recipe/${initialRecipe?.id}`);
       } else {
