@@ -42,7 +42,13 @@ export function RecipeSearch({
           className="w-full"
         />
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="flex overflow-x-scroll gap-2"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <Button
           variant={selectedCategory === "All" ? "default" : "outline"}
           onClick={() => handleCategoryChange("All")}
@@ -50,24 +56,16 @@ export function RecipeSearch({
         >
           All
         </Button>
-        <div
-          className="flex overflow-x-scroll gap-2"
-          style={{
-            scrollbarWidth: "none", 
-            msOverflowStyle: "none", 
-          }}
-        >
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              onClick={() => handleCategoryChange(category)}
-              size="sm"
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
+        {categories.map((category) => (
+          <Button
+            key={category}
+            variant={selectedCategory === category ? "default" : "outline"}
+            onClick={() => handleCategoryChange(category)}
+            size="sm"
+          >
+            {category}
+          </Button>
+        ))}
       </div>
     </div>
   );

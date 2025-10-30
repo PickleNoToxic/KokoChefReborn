@@ -154,7 +154,7 @@ export default function RecipeDetailPage({
             <CardContent>
               <ol className="space-y-4">
                 {recipe.steps.map((step: string, index: number) => (
-                  <li key={index} className="flex gap-4">
+                  <li key={index} className="flex gap-4 items-center">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center text-center justify-center font-semibold">
                       {index + 1}
                     </div>
