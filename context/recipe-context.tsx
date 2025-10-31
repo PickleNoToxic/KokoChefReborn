@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/context/toast-context"
+import { useAuth } from "./auth-context";
 export interface Recipe {
   id: string
   title: string
@@ -35,6 +36,7 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [bookmarks, setBookmarks] = useState<string[]>([])
   const { addToast } = useToast()
+  const { user } = useAuth();
   // Fetch recipes from Supabase
   const fetchRecipes = async () => {
     const { data, error } = await supabase
@@ -66,14 +68,34 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Load bookmarks from localStorage on mount
   useEffect(() => {
-    fetchRecipes()
-    const storedBookmarks = localStorage.getItem("bookmarks")
-    if (storedBookmarks) {
-      setBookmarks(JSON.parse(storedBookmarks))
-    }
-  }, [])
+    if (!user) return;
+
+    const fetchData = async () => {
+      try {
+        await fetchRecipes();
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("bookmarks")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching bookmarks:", error);
+        } else {
+          console.log("Bookmarks from Supabase:", data?.bookmarks);
+          if (data?.bookmarks) {
+            setBookmarks(data.bookmarks);
+          }
+        }
+      } catch (err) {
+        console.error("Error in useEffect:", err);
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   const addRecipe = (recipe: Omit<Recipe, "id" | "createdAt">) => {
     const newRecipe: Recipe = {
@@ -93,27 +115,62 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
   }
 
 
-  const toggleBookmark = (recipeId: string) => {
-  try {
-    const isBookmarked = bookmarks.includes(recipeId)
-    const newBookmarks = isBookmarked
-      ? bookmarks.filter((id) => id !== recipeId)
-      : [...bookmarks, recipeId]
+  const toggleBookmark = async (recipeId: string) => {
+    try {
+      if (!user) {
+        addToast("Anda harus login untuk menyimpan bookmark.", true);
+        return;
+      }
 
-    setBookmarks(newBookmarks)
-    localStorage.setItem("bookmarks", JSON.stringify(newBookmarks))
+      const isBookmarked = bookmarks.includes(recipeId);
+      const newBookmarks = isBookmarked
+        ? bookmarks.filter((id) => id !== recipeId)
+        : [...bookmarks, recipeId];
 
-    addToast(
-      isBookmarked
-        ? "Resep dihapus dari bookmark!"
-        : "Resep berhasil ditambahkan ke bookmark!",
-      false
-    )
-  } catch (error) {
-    console.error("Gagal memperbarui bookmark:", error)
-    addToast("Terjadi kesalahan saat memperbarui bookmark.", true)
-  }
-}
+      setBookmarks(newBookmarks);
+
+      const { data: recipeData, error: recipeFetchError } = await supabase
+        .from("recipes")
+        .select("likes")
+        .eq("id", recipeId)
+        .single();
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ bookmarks: newBookmarks })
+        .eq("id", user.id);
+
+      const currentLikes = recipeData?.likes ?? 0;
+      const newLikes = isBookmarked ? currentLikes - 1 : currentLikes + 1;
+
+      const { error: likeError } = await supabase
+        .from("recipes")
+        .update({ likes: newLikes })
+        .eq("id", recipeId);
+
+      if (likeError) {
+        console.error("Gagal memperbarui likes:", likeError);
+        addToast("Gagal memperbarui jumlah like di server.", true);
+        return;
+      }
+
+      if (error) {
+        console.error("Supabase update failed:", error);
+        addToast("Gagal menyinkronkan bookmark ke server.", true);
+      } else {
+        addToast(
+          isBookmarked
+            ? "Resep dihapus dari bookmark!"
+            : "Resep berhasil ditambahkan ke bookmark!",
+          false
+        );
+      }
+    } catch (error) {
+      console.error("Gagal memperbarui bookmark:", error);
+      addToast("Terjadi kesalahan saat memperbarui bookmark.", true);
+    }
+  };
+
 
   const getRecipesByCreator = (creatorId: string) => {
     return recipes.filter((r) => r.creatorId === creatorId)
