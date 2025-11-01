@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function MyRecipesPage() {
   const { user, isLoading } = useAuth()
-  const { recipes, getRecipesByCreator } = useRecipes()
+  const { recipes, deleteRecipe } = useRecipes()
   const router = useRouter()
   const [userRecipes, setUserRecipes] = useState<any[]>([])
   const [selectedRecipe, setSelectedRecipe] = useState<any | null>(null)
@@ -34,10 +34,10 @@ export default function MyRecipesPage() {
   // Ambil resep milik user
   useEffect(() => {
     if (user) {
-      const myRecipes = getRecipesByCreator(user.id);
-      setUserRecipes(myRecipes);
+      const myRecipes = recipes.filter((r: any) => r.creatorId === user.id)
+      setUserRecipes(myRecipes)
     }
-  }, [user, recipes, getRecipesByCreator]);
+  }, [user, recipes]);
 
   // Fungsi delete Supabase
   const handleDelete = async (recipeId: string) => {
@@ -45,6 +45,9 @@ export default function MyRecipesPage() {
     try {
       const { error } = await supabase.from("recipes").delete().eq("id", recipeId)
       if (error) throw error
+
+      // Sinkronkan state global agar daftar ikut terhapus di semua tempat
+      deleteRecipe(recipeId)
 
       setUserRecipes((prev) => prev.filter((r) => r.id !== recipeId))
       addToast("Resep berhasil dihapus")
