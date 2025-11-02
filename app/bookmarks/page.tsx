@@ -55,7 +55,7 @@ export default function BookmarksPage() {
         </div>
 
         {bookmarkedRecipes.length === 0 ? (
-          <Card>
+          <Card className="pt-0">
             <CardContent className="pt-12 pb-12 text-center">
               <p className="text-muted-foreground text-lg mb-4">
                 Belum ada resep yang disimpan.
@@ -72,7 +72,7 @@ export default function BookmarksPage() {
             {bookmarkedRecipes.map((recipe) => (
               <Card
                 key={recipe.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col pt-0"
               >
                 <div className="relative h-48 w-full overflow-hidden bg-muted">
                   <Image
